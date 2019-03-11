@@ -4,16 +4,15 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-// Logger this is where we will log all interactions
-var Logger logrus.Logger
-
+var logger *logrus.Logger
 var isInitialized bool
-
 var securityToken string
 
 // Init Here is where we will
 func Init(c Config) {
 	securityToken = c.SecurityToken
+	logger = c.Logger
 
+	logger.Info("The vonigo package has been successfully initialized")
 	isInitialized = true
 }
