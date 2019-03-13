@@ -58,7 +58,7 @@ func getSecurityToken() error {
 	defer response.Body.Close()
 
 	body, err := ioutil.ReadAll(response.Body)
-	fmt.Println(body)
+	fmt.Println(string(body))
 
 	return nil
 }
