@@ -1,13 +1,20 @@
 package vonigo
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/Sirupsen/logrus"
+)
 
 func TestCanInitializeThePackage(t *testing.T) {
 	if isInitialized {
 		t.Error("the package should not be initialized to start with")
 	}
 
-	c := Config{}
+	logger := logrus.New()
+	c := Config{
+		Logger: logger,
+	}
 	Init(c)
 
 	if !isInitialized {
