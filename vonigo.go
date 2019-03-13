@@ -5,14 +5,22 @@ import (
 )
 
 var logger *logrus.Logger
-var isInitialized bool
 var securityToken string
+var baseURL string
+var appVersion string
+var username string
+var password string
 
 // Init Here is where we will
-func Init(c Config) {
-	securityToken = c.SecurityToken
-	logger = c.Logger
+func Init(c Config) error {
+	err := c.validate()
+	if err != nil {
+		return err
+	}
+	baseURL = c.BaseURL
+	appVersion = c.AppVersion
+	username = c.Username
+	password = c.Password
 
-	logger.Info("The vonigo package has been successfully initialized")
-	isInitialized = true
+	return nil
 }
