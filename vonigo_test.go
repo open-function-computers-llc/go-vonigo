@@ -15,32 +15,39 @@ func TestCanInitializeThePackage(t *testing.T) {
 	err := Init(c)
 	fmt.Println(err)
 
-	if err == nil && err.Error() != "BaseURL is required." {
-		t.Error("Expected error message: 'BaseURL is required.'")
+	if err == nil && err.Error() != "BaseURL is required" {
+		t.Error("Expected error message: 'BaseURL is required'")
 	}
 
 	c.BaseURL = "https://example.com"
 	err = Init(c)
 
-	if err == nil && err.Error() != "AppVersion is required." {
+	if err == nil && err.Error() != "AppVersion is required" {
 		t.Error("Expected error message: 'AppVersion is required'")
 	}
 
 	c.AppVersion = "1"
 	err = Init(c)
 
-	if err == nil && err.Error() != "Username is required." {
-		t.Error("Expected Error: 'Username is required.'")
+	if err == nil && err.Error() != "Username is required" {
+		t.Error("Expected Error: 'Username is required'")
 	}
 
 	c.Username = "username"
 	err = Init(c)
 
-	if err == nil && err.Error() != "Password is required." {
-		t.Error("Expected error message: 'Password is required.")
+	if err == nil && err.Error() != "Password is required" {
+		t.Error("Expected error message: 'Password is required'")
 	}
 
 	c.Password = "password"
+	err = Init(c)
+
+	if err == nil && err.Error() != "Company is required" {
+		t.Error("Expected error message: 'Company is required'")
+	}
+
+	c.Company = "company"
 	err = Init(c)
 
 	// Check to ensure global variables have been set properly
@@ -54,8 +61,12 @@ func TestCanInitializeThePackage(t *testing.T) {
 		t.Error("Package variable 'username' was not set properly")
 	}
 
-	if password != "password" {
-		t.Error("Package variable 'password' was not set properly")
+	if password != "5f4dcc3b5aa765d61d8327deb882cf99" {
+		t.Error("Package variable 'password' was not set properly, or it got the wrong MD5 hash")
+	}
+
+	if company != "company" {
+		t.Error("Package variable 'company' was not set properly")
 	}
 
 }
