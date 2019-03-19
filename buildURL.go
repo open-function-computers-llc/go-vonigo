@@ -18,6 +18,13 @@ func buildURL(base string, path string, qparams map[string]string) (string, erro
 		v.Add(key, value)
 	}
 
+	// Vonigo requires a trailing '/' on the path of requests
+	lastCharacterOfPath := path[len(path)-1:]
+
+	if lastCharacterOfPath != "/" {
+		path = path + "/"
+	}
+
 	u := &url.URL{
 		Scheme:   "https",
 		Host:     base,

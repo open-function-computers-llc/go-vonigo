@@ -22,9 +22,9 @@ func TestCanBuildURL(t *testing.T) {
 	if err != nil {
 		t.Error("URL Failed to build")
 	}
-
-	if url1 != "https://example.com/data/url?query1=query1value&query2=query2value" {
-		t.Error("BuildURL failed to correctly build the URL")
+	// Vonigo requires a trailing slash between the path and query params
+	if url1 != "https://example.com/data/url/?query1=query1value&query2=query2value" {
+		t.Error("BuildURL failed to correctly build the URL. Expected: " + "https://example.com/data/url/?query1=query1value&query2=query2value" + " Got " + url1)
 	}
 }
 
