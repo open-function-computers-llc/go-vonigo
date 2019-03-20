@@ -70,3 +70,24 @@ func TestCanInitializeThePackage(t *testing.T) {
 	}
 
 }
+
+// func TestCanGetClients(t *testing.T) {
+// 	// Setting up a new config
+// 	c := Config{}
+
+// 	// Test to make sure config has valid properties
+// 	err := Init(c)
+// 	if err != nil {
+// 		t.Error("Failed to initialize")
+// 	}
+
+// 	clients, err := GetClients()
+// 	if err != nil {
+// 		t.Error("Getting clients failed")
+// 	}
+
+// 	if clients.len <= 0 {
+// 		t.Error("Failed to return any clients")
+// 	}
+
+// }

@@ -1,10 +1,15 @@
 package vonigo
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/Sirupsen/logrus"
+)
 
 // Config This is where we will add anything we need to make this library work
 // the way we want it to
 type Config struct {
+	Logger     *logrus.Logger
 	BaseURL    string
 	AppVersion string
 	Username   string
@@ -13,6 +18,8 @@ type Config struct {
 }
 
 func (c Config) validate() error {
+
+	// TODO(Kyle) Test to make sure logrus is being passed in correctly
 	if c.BaseURL == "" {
 		return errors.New("BaseURL is required")
 	}

@@ -3,9 +3,16 @@ package vonigo
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+
+	"github.com/Sirupsen/logrus"
 )
 
-var securityToken string
+// Gloabl security token set in securityToken.go
+var log *logrus.Logger
 var baseURL string
 var appVersion string
 var username string
@@ -22,6 +29,7 @@ func Init(c Config) error {
 	baseURL = c.BaseURL
 	appVersion = c.AppVersion
 	username = c.Username
+	log = c.Logger
 
 	// vonigo wants the MD5 hash of the password, not the raw text password
 	rawPassword := c.Password
@@ -37,4 +45,34 @@ func Init(c Config) error {
 
 	isInitialized = true
 	return nil
+}
+
+// GetClients - Get all clients
+func GetClients(params map[string]string) ([]Client, error) {
+	clients := []Client{}
+	clientResponse := ClientResponse{}
+
+	if !hasSecurityToken() {
+		err := getSecurityToken()
+		if err != nil {
+			return clients, err
+		}
+	}
+
+	params["securityToken"] = securityToken
+
+	reqURL, err := buildURL(baseURL, "api/v1/data/Clients", params)
+	if err != nil {
+		return nil, err
+	}
+	var emptyPostValues url.Values
+	resp, err := http.PostForm(reqURL, emptyPostValues)
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	err = json.Unmarshal(body, &clientResponse)
+	if err != nil {
+		return nil, err
+	}
+	return clientResponse.Clients, nil
 }

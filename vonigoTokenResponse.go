@@ -1,7 +1,7 @@
 package vonigo
 
 import (
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -42,27 +42,35 @@ type tokenResponse struct {
 }
 
 func getSecurityToken() error {
-	// this is for testing only
-	if baseURL == "https://example.com" {
-		securityToken = "fakeSecurityToken"
-		return nil
+	params := map[string]string{
+		"appVersion": appVersion,
+		"username":   username,
+		"password":   password,
+		"company":    company,
 	}
-
-	// https://stackoverflow.com/questions/24493116/how-to-send-a-post-request-in-go
-	// all the paramaters that vonigo wants are in the URL, even though we are making a POST request
-	formValues := url.Values{}
-	response, err := http.PostForm(getTokenURL(), formValues)
+	reqURL, err := buildURL(baseURL, "api/v1/security/login/", params)
 	if err != nil {
 		return err
 	}
-	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(response.Body)
-	fmt.Println(string(body))
+	var emptyPostValues url.Values
+	log.Info(reqURL)
+	resp, err := http.PostForm(reqURL, emptyPostValues)
+	if err != nil {
+		return err
+	}
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	tknresp := tokenResponse{}
+
+	err = json.Unmarshal(body, &tknresp)
+	if err != nil {
+		return err
+	}
+
+	log.Info(tknresp)
+	securityToken = tknresp.SecurityToken
+	log.Info(securityToken)
 
 	return nil
-}
-
-func getTokenURL() string {
-	return baseURL + "/api/v1/security/login/?appVersion=" + appVersion + "&company=" + company + "&password=" + password + "&userName=" + username
 }
