@@ -2,6 +2,7 @@ package vonigo
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -80,18 +81,16 @@ func getBaseParams(action string) (map[string]string, error) {
 		"securityToken": securityToken,
 	}
 
-	if action == "retrieve" {
-		value["method"] = "1"
+	validActions := map[string]string{
+		"retrieve": "1",
+		"update":   "2",
+		"create":   "3",
 	}
 
-	if action == "update" {
-		value["method"] = "2"
+	if _, ok := validActions[action]; !ok {
+		return value, errors.New("Invalid action")
 	}
 
-	if action == "create" {
-		value["method"] = "3"
-	}
-
+	value["method"] = validActions[action]
 	return value, nil
-
 }
