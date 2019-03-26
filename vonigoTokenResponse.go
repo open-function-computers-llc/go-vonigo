@@ -48,7 +48,7 @@ func getSecurityToken() error {
 		"password":   password,
 		"company":    company,
 	}
-	reqURL, err := buildURL(baseURL, "api/v1/security/login/", params)
+	reqURL, _, err := buildURL(baseURL, "api/v1/security/login/", params)
 	if err != nil {
 		return err
 	}
@@ -73,4 +73,25 @@ func getSecurityToken() error {
 	log.Info(securityToken)
 
 	return nil
+}
+
+func getBaseParams(action string) (map[string]string, error) {
+	value := map[string]string{
+		"securityToken": securityToken,
+	}
+
+	if action == "retrieve" {
+		value["method"] = "1"
+	}
+
+	if action == "update" {
+		value["method"] = "2"
+	}
+
+	if action == "create" {
+		value["method"] = "3"
+	}
+
+	return value, nil
+
 }

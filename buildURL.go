@@ -6,13 +6,12 @@ import (
 	"strings"
 )
 
-func buildURL(base string, path string, qparams map[string]string) (string, error) {
+func buildURL(base string, path string, qparams map[string]string) (string, url.Values, error) {
+	v := url.Values{}
 
 	if strings.Contains(base, "http") {
-		return "", errors.New("Do not pass the protocal with the url, only the host")
+		return "", v, errors.New("Do not pass the protocal with the url, only the host")
 	}
-
-	v := url.Values{}
 
 	for key, value := range qparams {
 		v.Add(key, value)
@@ -32,6 +31,6 @@ func buildURL(base string, path string, qparams map[string]string) (string, erro
 		RawQuery: v.Encode(),
 	}
 
-	return u.String(), nil
+	return u.String(), v, nil
 
 }

@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -63,7 +64,7 @@ func GetClients(params map[string]string) ([]Client, error) {
 
 	params["securityToken"] = securityToken
 
-	reqURL, err := buildURL(baseURL, "api/v1/data/Clients", params)
+	reqURL, _, err := buildURL(baseURL, "api/v1/data/Clients", params)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +81,8 @@ func GetClients(params map[string]string) ([]Client, error) {
 }
 
 // GetClient - Get a single client
-func GetClient(params map[string]string) (Client, error) {
+func GetClient(id int) (Client, error) {
+	//stringID := strconv.Itoa(id)
 	client := Client{}
 	clientResponse := ClientResponse{}
 
@@ -90,18 +92,22 @@ func GetClient(params map[string]string) (Client, error) {
 			return client, err
 		}
 	}
+	params, _ := getBaseParams("")
 
-	params["securityToken"] = securityToken
-	params["method"] = "1"
-
-	reqURL, err := buildURL(baseURL, "api/v1/data/Clients", params)
+	reqURL, urlValues, err := buildURL(baseURL, "api/v1/data/Clients", params)
 	if err != nil {
 		return client, err
 	}
-	var emptyPostValues url.Values
-	resp, err := http.PostForm(reqURL, emptyPostValues)
+	fmt.Println(reqURL)
+	resp, err := http.PostForm(reqURL, urlValues)
 
 	body, _ := ioutil.ReadAll(resp.Body)
+
+	err = checkVonigoError(body)
+
+	if err != nil {
+		return client, err
+	}
 
 	err = json.Unmarshal(body, &clientResponse)
 	if err != nil {
@@ -118,6 +124,6 @@ func GetLeads(params map[string]string) ([]Client, error) {
 }
 
 // GetLead - Get a single lead
-func GetLead(params map[string]string) (Client, error) {
-	return GetClient(params)
+func GetLead(id int) (Client, error) {
+	return GetClient(id)
 }

@@ -17,7 +17,7 @@ func TestCanBuildURL(t *testing.T) {
 
 	// pass those locals vars into buildURL
 
-	url1, err := buildURL(baseurl, pathurl, paramsurl)
+	url1, _, err := buildURL(baseurl, pathurl, paramsurl)
 
 	if err != nil {
 		t.Error("URL Failed to build")
@@ -34,7 +34,7 @@ func TestBaseUrlCantHaveProtocal(t *testing.T) {
 	pathurl := ""
 	paramsurl := map[string]string{}
 
-	_, err := buildURL(baseurl, pathurl, paramsurl)
+	_, _, err := buildURL(baseurl, pathurl, paramsurl)
 
 	if err == nil && err.Error() != "Do not pass the protocal with the url, only the host" {
 		t.Error("Failed to catch incorrect base URL format")
