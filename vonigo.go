@@ -47,10 +47,12 @@ func Init(c Config) error {
 	return nil
 }
 
+// ***** Clients ***** //
+
 // GetClients - Get all clients
 func GetClients(params map[string]string) ([]Client, error) {
 	clients := []Client{}
-	clientResponse := ClientResponse{}
+	clientResponse := ClientsResponse{}
 
 	if !hasSecurityToken() {
 		err := getSecurityToken()
@@ -75,4 +77,47 @@ func GetClients(params map[string]string) ([]Client, error) {
 		return nil, err
 	}
 	return clientResponse.Clients, nil
+}
+
+// GetClient - Get a single client
+func GetClient(params map[string]string) (Client, error) {
+	client := Client{}
+	clientResponse := ClientResponse{}
+
+	if !hasSecurityToken() {
+		err := getSecurityToken()
+		if err != nil {
+			return client, err
+		}
+	}
+
+	params["securityToken"] = securityToken
+	params["method"] = "1"
+
+	reqURL, err := buildURL(baseURL, "api/v1/data/Clients", params)
+	if err != nil {
+		return client, err
+	}
+	var emptyPostValues url.Values
+	resp, err := http.PostForm(reqURL, emptyPostValues)
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	err = json.Unmarshal(body, &clientResponse)
+	if err != nil {
+		return client, err
+	}
+	return clientResponse.Client, nil
+}
+
+// ***** Leads ***** //
+
+// GetLeads - Get all leads
+func GetLeads(params map[string]string) ([]Client, error) {
+	return GetClients(params)
+}
+
+// GetLead - Get a single lead
+func GetLead(params map[string]string) (Client, error) {
+	return GetClient(params)
 }
