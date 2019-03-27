@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
+	"strconv"
 
 	"github.com/Sirupsen/logrus"
 )
@@ -62,14 +62,18 @@ func GetClients(params map[string]string) ([]Client, error) {
 		}
 	}
 
-	params["securityToken"] = securityToken
+	mergedParams, _ := getBaseParams("retrieve")
 
-	reqURL, _, err := buildURL(baseURL, "api/v1/data/Clients", params)
+	for i, item := range params {
+		mergedParams[i] = item
+	}
+
+	reqURL, reqParams, err := buildURL(baseURL, "api/v1/data/Clients", mergedParams)
 	if err != nil {
 		return nil, err
 	}
-	var emptyPostValues url.Values
-	resp, err := http.PostForm(reqURL, emptyPostValues)
+
+	resp, err := http.PostForm(reqURL, reqParams)
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
@@ -82,7 +86,7 @@ func GetClients(params map[string]string) ([]Client, error) {
 
 // GetClient - Get a single client
 func GetClient(id int) (Client, error) {
-	//stringID := strconv.Itoa(id)
+	stringID := strconv.Itoa(id)
 	client := Client{}
 	clientResponse := ClientResponse{}
 
@@ -92,7 +96,8 @@ func GetClient(id int) (Client, error) {
 			return client, err
 		}
 	}
-	params, _ := getBaseParams("")
+	params, _ := getBaseParams("retrieve")
+	params["objectID"] = stringID
 
 	reqURL, urlValues, err := buildURL(baseURL, "api/v1/data/Clients", params)
 	if err != nil {
