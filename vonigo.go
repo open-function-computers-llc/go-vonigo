@@ -20,6 +20,7 @@ var username string
 var password string
 var company string
 var isInitialized bool
+var fieldMap map[string]int
 
 // Init Check for all the required package level variables, and get a vonigo security token
 func Init(c Config) error {
@@ -31,6 +32,7 @@ func Init(c Config) error {
 	appVersion = c.AppVersion
 	username = c.Username
 	log = c.Logger
+	fieldMap = c.FieldMapper
 
 	// vonigo wants the MD5 hash of the password, not the raw text password
 	rawPassword := c.Password
@@ -63,6 +65,7 @@ func GetClients(params map[string]string) ([]Client, error) {
 	}
 
 	params["securityToken"] = securityToken
+	params["isCompleteObject"] = "1" // get the whole contact object
 
 	reqURL, _, err := buildURL(baseURL, "api/v1/data/Clients", params)
 	if err != nil {

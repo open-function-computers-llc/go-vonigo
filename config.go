@@ -9,12 +9,13 @@ import (
 // Config This is where we will add anything we need to make this library work
 // the way we want it to
 type Config struct {
-	Logger     *logrus.Logger
-	BaseURL    string
-	AppVersion string
-	Username   string
-	Password   string
-	Company    string
+	Logger      *logrus.Logger
+	BaseURL     string
+	AppVersion  string
+	Username    string
+	Password    string
+	Company     string
+	FieldMapper map[string]int
 }
 
 func (c Config) validate() error {
