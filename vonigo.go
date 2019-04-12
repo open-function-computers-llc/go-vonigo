@@ -65,6 +65,12 @@ func GetClients(params map[string]string) ([]Client, error) {
 	mergedParams, _ := getBaseParams("retrieve")
 
 	for i, item := range params {
+
+		if i == "minutes" {
+			start, end := getMinutesAgo(item)
+			mergedParams["dateStart"] = start
+			mergedParams["dateEnd"] = end
+		}
 		mergedParams[i] = item
 	}
 
