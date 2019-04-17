@@ -80,6 +80,16 @@ type Lead struct {
 	} `json:"Relations"`
 }
 
+// GetEmail - Get email for lead
+func (c Lead) GetEmail() string {
+	for _, value := range c.Fields {
+		if value.FieldID == fieldMap["email"] {
+			return value.FieldValue
+		}
+	}
+	return ""
+}
+
 // GetLeads - Get all leads
 func GetLeads(params map[string]string) ([]Lead, error) {
 	leads := []Lead{}
