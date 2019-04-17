@@ -1,7 +1,7 @@
 package vonigo
 
 // Client this is a client in the format that Vonigo returns to us
-type Client struct {
+type Lead struct {
 	ObjectID               string `json:"objectID"`
 	Name                   string `json:"name"`
 	Title                  string `json:"title"`
