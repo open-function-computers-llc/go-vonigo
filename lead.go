@@ -1,5 +1,12 @@
 package vonigo
 
+import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+)
+
 // Client this is a client in the format that Vonigo returns to us
 type Lead struct {
 	ObjectID               string `json:"objectID"`
@@ -71,4 +78,78 @@ type Lead struct {
 		RelationType string `json:"relationType"`
 		IsActive     string `json:"isActive"`
 	} `json:"Relations"`
+}
+
+// GetLeads - Get all leads
+func GetLeads(params map[string]string) ([]Lead, error) {
+	leads := []Lead{}
+	leadResponse := LeadsResponse{}
+	log.Info("get leads!")
+
+	if !hasSecurityToken() {
+		err := getSecurityToken()
+		if err != nil {
+			return leads, err
+		}
+	}
+
+	log.Info("Params for Leads lookup: ", params)
+
+	mergedParams, _ := getBaseParams("retrieve")
+
+	for i, item := range params {
+		mergedParams[i] = item
+	}
+
+	reqURL, reqParams, err := buildURL(baseURL, "api/v1/data/Leads", mergedParams)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := http.PostForm(reqURL, reqParams)
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	err = json.Unmarshal(body, &leadResponse)
+	if err != nil {
+		return nil, err
+	}
+	return leadResponse.Leads, nil
+}
+
+// GetClient - Get a single client
+func GetLead(id int) (Lead, error) {
+	stringID := strconv.Itoa(id)
+	lead := Lead{}
+	leadResponse := LeadResponse{}
+
+	if !hasSecurityToken() {
+		err := getSecurityToken()
+		if err != nil {
+			return lead, err
+		}
+	}
+	params, _ := getBaseParams("retrieve")
+	params["objectID"] = stringID
+
+	reqURL, urlValues, err := buildURL(baseURL, "api/v1/data/Leads", params)
+	if err != nil {
+		return lead, err
+	}
+	log.Info(reqURL)
+	resp, err := http.PostForm(reqURL, urlValues)
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	err = checkVonigoError(body)
+
+	if err != nil {
+		return lead, err
+	}
+
+	err = json.Unmarshal(body, &leadResponse)
+	if err != nil {
+		return lead, err
+	}
+	return leadResponse.Lead, nil
 }

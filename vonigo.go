@@ -44,15 +44,3 @@ func Init(c Config) error {
 	isInitialized = true
 	return nil
 }
-
-// ***** Leads ***** //
-
-// GetLeads - Get all leads
-func GetLeads(params map[string]string) ([]Client, error) {
-	return GetClients(params)
-}
-
-// GetLead - Get a single lead
-func GetLead(id int) (Client, error) {
-	return GetClient(id)
-}
