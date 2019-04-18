@@ -91,6 +91,6 @@ func getBaseParams(action string) (map[string]string, error) {
 		return value, errors.New("Invalid action")
 	}
 
-	value["method"] = validActions[action]
+	// value["method"] = validActions[action]
 	return value, nil
 }

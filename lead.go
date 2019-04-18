@@ -106,6 +106,7 @@ func GetLeads(params map[string]string) ([]Lead, error) {
 	log.Info("Params for Leads lookup: ", params)
 
 	mergedParams, _ := getBaseParams("retrieve")
+	mergedParams["dateMode"] = "1"
 
 	for i, item := range params {
 		mergedParams[i] = item
@@ -122,6 +123,7 @@ func GetLeads(params map[string]string) ([]Lead, error) {
 
 	err = json.Unmarshal(body, &leadResponse)
 	if err != nil {
+		log.Error(err.Error())
 		return nil, err
 	}
 	return leadResponse.Leads, nil
