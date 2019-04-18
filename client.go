@@ -103,21 +103,12 @@ func GetClients(params map[string]string) ([]Client, error) {
 		}
 	}
 
-	// TODO: Make this timestamp thing friendly
-	// params["startDate"] = "1555083741"
-	// params["endDate"] = "1655083741"
-	params["endDate"] = "1655083741"
 	log.Info("Params for Clients lookup: ", params)
 
 	mergedParams, _ := getBaseParams("retrieve")
 
 	for i, item := range params {
 
-		if i == "minutes" {
-			start, end := getMinutesAgo(item)
-			mergedParams["dateStart"] = start
-			mergedParams["dateEnd"] = end
-		}
 		mergedParams[i] = item
 	}
 
