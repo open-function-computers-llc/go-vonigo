@@ -103,14 +103,14 @@ func GetClients(params map[string]string) ([]Client, error) {
 		}
 	}
 
-	log.Info("Params for Clients lookup: ", params)
-
 	mergedParams, _ := getBaseParams("retrieve")
 
 	for i, item := range params {
 
 		mergedParams[i] = item
 	}
+
+	log.Info("Params for Clients lookup: ", mergedParams)
 
 	reqURL, reqParams, err := buildURL(baseURL, "api/v1/data/Clients", mergedParams)
 	if err != nil {

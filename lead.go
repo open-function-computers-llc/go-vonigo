@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-// Client this is a client in the format that Vonigo returns to us
+// Lead this is a client in the format that Vonigo returns to us
 type Lead struct {
 	ObjectID               string `json:"objectID"`
 	Name                   string `json:"name"`
@@ -129,7 +129,7 @@ func GetLeads(params map[string]string) ([]Lead, error) {
 	return leadResponse.Leads, nil
 }
 
-// GetClient - Get a single client
+// GetLead - Get a single client
 func GetLead(id int) (Lead, error) {
 	stringID := strconv.Itoa(id)
 	lead := Lead{}
