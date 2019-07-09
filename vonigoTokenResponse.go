@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 )
 
 type tokenResponse struct {
@@ -49,14 +48,15 @@ func getSecurityToken() error {
 		"password":   password,
 		"company":    company,
 	}
-	reqURL, _, err := buildURL(baseURL, "api/v1/security/login/", params)
+
+	log.Info(params)
+	reqURL, _, err := buildURLWithParams(baseURL, "api/v1/security/login/", params)
 	if err != nil {
 		return err
 	}
 
-	var emptyPostValues url.Values
 	log.Info(reqURL)
-	resp, err := http.PostForm(reqURL, emptyPostValues)
+	resp, err := http.Get(reqURL)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func getSecurityToken() error {
 	if err != nil {
 		return err
 	}
-
+	log.Info("This is the response from getting the token:")
 	log.Info(tknresp)
 	securityToken = tknresp.SecurityToken
 	log.Info(securityToken)
@@ -76,12 +76,12 @@ func getSecurityToken() error {
 	return nil
 }
 
-func getBaseParams(action string) (map[string]string, error) {
-	value := map[string]string{
+func getBaseParams(action string) (map[string]interface{}, error) {
+	value := map[string]interface{}{
 		"securityToken": securityToken,
 	}
 
-	validActions := map[string]string{
+	validActions := map[string]interface{}{
 		"retrieve": "1",
 		"update":   "2",
 		"create":   "3",
@@ -91,6 +91,6 @@ func getBaseParams(action string) (map[string]string, error) {
 		return value, errors.New("Invalid action")
 	}
 
-	// value["method"] = validActions[action]
+	value["method"] = validActions[action]
 	return value, nil
 }

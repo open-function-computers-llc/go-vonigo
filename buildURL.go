@@ -6,15 +6,10 @@ import (
 	"strings"
 )
 
-func buildURL(base string, path string, qparams map[string]string) (string, url.Values, error) {
-	v := url.Values{}
+func buildURL(base string, path string) (string, error) {
 
 	if strings.Contains(base, "http") {
-		return "", v, errors.New("Do not pass the protocal with the url, only the host")
-	}
-
-	for key, value := range qparams {
-		v.Add(key, value)
+		return "", errors.New("Do not pass the protocal with the url, only the host")
 	}
 
 	// Vonigo requires a trailing '/' on the path of requests
@@ -25,12 +20,10 @@ func buildURL(base string, path string, qparams map[string]string) (string, url.
 	}
 
 	u := &url.URL{
-		Scheme:   "https",
-		Host:     base,
-		Path:     path,
-		RawQuery: v.Encode(),
+		Scheme: "https",
+		Host:   base,
+		Path:   path,
 	}
 
-	return u.String(), v, nil
-
+	return u.String(), nil
 }

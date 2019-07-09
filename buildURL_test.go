@@ -10,21 +10,17 @@ func TestCanBuildURL(t *testing.T) {
 
 	baseurl := "example.com"
 	pathurl := "data/url"
-	paramsurl := map[string]string{
-		"query1": "query1value",
-		"query2": "query2value",
-	}
 
 	// pass those locals vars into buildURL
 
-	url1, _, err := buildURL(baseurl, pathurl, paramsurl)
+	url1, err := buildURL(baseurl, pathurl)
 
 	if err != nil {
 		t.Error("URL Failed to build")
 	}
 	// Vonigo requires a trailing slash between the path and query params
-	if url1 != "https://example.com/data/url/?query1=query1value&query2=query2value" {
-		t.Error("BuildURL failed to correctly build the URL. Expected: " + "https://example.com/data/url/?query1=query1value&query2=query2value" + " Got " + url1)
+	if url1 != "https://example.com/data/url/" {
+		t.Error("BuildURL failed to correctly build the URL. Expected: " + "https://example.com/data/url/" + " Got " + url1)
 	}
 }
 
@@ -32,9 +28,8 @@ func TestBaseUrlCantHaveProtocal(t *testing.T) {
 
 	baseurl := "https://example.com"
 	pathurl := ""
-	paramsurl := map[string]string{}
 
-	_, _, err := buildURL(baseurl, pathurl, paramsurl)
+	_, err := buildURL(baseurl, pathurl)
 
 	if err == nil && err.Error() != "Do not pass the protocal with the url, only the host" {
 		t.Error("Failed to catch incorrect base URL format")
