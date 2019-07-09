@@ -62,6 +62,11 @@ func getSecurityToken() error {
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
 
+	err = checkVonigoError(body)
+	if err != nil {
+		return err
+	}
+
 	tknresp := tokenResponse{}
 
 	err = json.Unmarshal(body, &tknresp)
