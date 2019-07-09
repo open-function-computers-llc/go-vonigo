@@ -1,6 +1,7 @@
 package vonigo
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -94,6 +95,7 @@ func (c Lead) GetEmail() string {
 func GetLeads(params map[string]string) ([]Lead, error) {
 	leads := []Lead{}
 	leadResponse := LeadsResponse{}
+	client := &http.Client{}
 	log.Info("get leads!")
 
 	if !hasSecurityToken() {
@@ -112,12 +114,17 @@ func GetLeads(params map[string]string) ([]Lead, error) {
 		mergedParams[i] = item
 	}
 
-	reqURL, reqParams, err := buildURL(baseURL, "api/v1/data/Leads", mergedParams)
+	buf := new(bytes.Buffer)
+	json.NewEncoder(buf).Encode(mergedParams)
+
+	reqURL, err := buildURL(baseURL, "api/v1/data/Leads")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := http.PostForm(reqURL, reqParams)
+	req, err := http.NewRequest("POST", reqURL, buf)
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := client.Do(req)
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
@@ -134,6 +141,7 @@ func GetLead(id int) (Lead, error) {
 	stringID := strconv.Itoa(id)
 	lead := Lead{}
 	leadResponse := LeadResponse{}
+	client := &http.Client{}
 
 	if !hasSecurityToken() {
 		err := getSecurityToken()
@@ -144,12 +152,18 @@ func GetLead(id int) (Lead, error) {
 	params, _ := getBaseParams("retrieve")
 	params["objectID"] = stringID
 
-	reqURL, urlValues, err := buildURL(baseURL, "api/v1/data/Leads", params)
+	reqURL, err := buildURL(baseURL, "api/v1/data/Leads")
 	if err != nil {
 		return lead, err
 	}
 	log.Info(reqURL)
-	resp, err := http.PostForm(reqURL, urlValues)
+
+	buf := new(bytes.Buffer)
+	json.NewEncoder(buf).Encode(params)
+
+	req, err := http.NewRequest("POST", reqURL, buf)
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := client.Do(req)
 
 	body, _ := ioutil.ReadAll(resp.Body)
 

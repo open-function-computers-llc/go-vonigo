@@ -1,6 +1,7 @@
 package vonigo
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -94,6 +95,7 @@ func (c Client) GetEmail() string {
 func GetClients(params map[string]string) ([]Client, error) {
 	clients := []Client{}
 	clientResponse := ClientsResponse{}
+	httpclient := &http.Client{}
 	log.Info("get clients!")
 
 	if !hasSecurityToken() {
@@ -106,18 +108,22 @@ func GetClients(params map[string]string) ([]Client, error) {
 	mergedParams, _ := getBaseParams("retrieve")
 
 	for i, item := range params {
-
 		mergedParams[i] = item
 	}
 
 	log.Info("Params for Clients lookup: ", mergedParams)
 
-	reqURL, reqParams, err := buildURL(baseURL, "api/v1/data/Clients", mergedParams)
+	reqURL, err := buildURL(baseURL, "api/v1/data/Clients")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := http.PostForm(reqURL, reqParams)
+	buf := new(bytes.Buffer)
+	json.NewEncoder(buf).Encode(mergedParams)
+
+	req, err := http.NewRequest("POST", reqURL, buf)
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := httpclient.Do(req)
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
@@ -132,6 +138,7 @@ func GetClients(params map[string]string) ([]Client, error) {
 func GetClient(id int) (Client, error) {
 	stringID := strconv.Itoa(id)
 	client := Client{}
+	httpclient := &http.Client{}
 	clientResponse := ClientResponse{}
 
 	if !hasSecurityToken() {
@@ -143,12 +150,18 @@ func GetClient(id int) (Client, error) {
 	params, _ := getBaseParams("retrieve")
 	params["objectID"] = stringID
 
-	reqURL, urlValues, err := buildURL(baseURL, "api/v1/data/Clients", params)
+	reqURL, err := buildURL(baseURL, "api/v1/data/Clients")
 	if err != nil {
 		return client, err
 	}
 	log.Info(reqURL)
-	resp, err := http.PostForm(reqURL, urlValues)
+
+	buf := new(bytes.Buffer)
+	json.NewEncoder(buf).Encode(params)
+
+	req, err := http.NewRequest("POST", reqURL, buf)
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := httpclient.Do(req)
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
