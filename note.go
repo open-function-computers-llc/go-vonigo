@@ -3,6 +3,7 @@ package vonigo
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 )
@@ -34,6 +35,10 @@ func CreateNote(clientID string, noteString string) (Note, error) {
 	note := Note{}
 	noteResponse := NoteResponse{}
 	client := &http.Client{}
+
+	if len(clientID) == 0 || len(noteString) == 0 {
+		return note, errors.New("Paraemters empty when creating a note")
+	}
 
 	log.Info("Creating note")
 
