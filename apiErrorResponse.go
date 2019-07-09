@@ -35,6 +35,10 @@ func checkVonigoError(body []byte) error {
 			errString += errItem.ErrMsg
 		}
 
+		if errString == "The following errors were returned by the API: " {
+			errString += errorResponse.ErrMsg
+		}
+
 		return errors.New(errString + " ")
 	}
 
