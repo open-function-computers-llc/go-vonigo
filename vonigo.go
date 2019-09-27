@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 // Gloabl security token set in securityToken.go
@@ -42,5 +42,8 @@ func Init(c Config) error {
 	}
 
 	isInitialized = true
+	for key, val := range fieldMap {
+		log.Info("Vonigo field "+key+" mapped to: ", val)
+	}
 	return nil
 }
