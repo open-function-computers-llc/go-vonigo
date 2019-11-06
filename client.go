@@ -91,6 +91,16 @@ func (c Client) GetEmail() string {
 	return ""
 }
 
+// GetPhoneNumber return the email address for the given Account
+func (c Client) GetPhoneNumber() string {
+	for _, value := range c.Fields {
+		if value.FieldID == fieldMap["phone"] {
+			return value.FieldValue
+		}
+	}
+	return ""
+}
+
 // GetClients - Get all clients
 func GetClients(params map[string]string) ([]Client, error) {
 	clients := []Client{}

@@ -49,7 +49,8 @@ func CreateNote(clientID string, noteString string) (Note, error) {
 		}
 	}
 
-	params, _ := getBaseParams("create")
+	params, _ := getBaseParams("create") // this used to work. vonigo is terrible and the mode needs to be set in each individual place now
+	params["method"] = "3"
 	fields, err := createFields("9291", noteString)
 
 	if err != nil {

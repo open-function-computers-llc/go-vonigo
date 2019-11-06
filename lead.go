@@ -91,6 +91,16 @@ func (c Lead) GetEmail() string {
 	return ""
 }
 
+// GetPhoneNumber - Get email for lead
+func (c Lead) GetPhoneNumber() string {
+	for _, value := range c.Fields {
+		if value.FieldID == fieldMap["phone"] {
+			return value.FieldValue
+		}
+	}
+	return ""
+}
+
 // GetLeads - Get all leads
 func GetLeads(params map[string]string) ([]Lead, error) {
 	leads := []Lead{}
@@ -104,8 +114,6 @@ func GetLeads(params map[string]string) ([]Lead, error) {
 			return leads, err
 		}
 	}
-
-	log.Info("Params for Leads lookup: ", params)
 
 	mergedParams, _ := getBaseParams("retrieve")
 	mergedParams["dateMode"] = "1"
