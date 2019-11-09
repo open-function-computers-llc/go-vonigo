@@ -1,9 +1,6 @@
 package vonigo
 
 import (
-	"crypto/md5"
-	"encoding/hex"
-
 	"github.com/sirupsen/logrus"
 )
 
@@ -29,11 +26,13 @@ func Init(c Config) error {
 	log = c.Logger
 	fieldMap = c.FieldMapper
 
+	//
 	// vonigo wants the MD5 hash of the password, not the raw text password
-	rawPassword := c.Password
-	hash := md5.Sum([]byte(rawPassword))
-	password = hex.EncodeToString(hash[:])
+	// rawPassword := c.Password
+	// hash := md5.Sum([]byte(rawPassword))
+	// password = hex.EncodeToString(hash[:])
 
+	password = c.Password
 	company = c.Company
 
 	err = getSecurityToken()

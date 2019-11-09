@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // Lead this is a client in the format that Vonigo returns to us
@@ -99,6 +100,46 @@ func (c Lead) GetPhoneNumber() string {
 		}
 	}
 	return ""
+}
+
+// GetNextWorkOrderDate - return the string date of the next work order for a lead
+func (c Lead) GetNextWorkOrderDate() string {
+
+	clientID := c.ObjectID
+	workOrders, err := GetClientWorkOrders(clientID)
+	if err != nil {
+		return ""
+	}
+
+	if len(workOrders) == 0 {
+		return ""
+	}
+
+	if len(workOrders) == 1 {
+		order := workOrders[0]
+		return getStringTime(order.DateService)
+	}
+
+	currentTime := int(time.Now().Unix())
+	timeDiff := 0
+	serviceTime := ""
+	for _, o := range workOrders {
+		service, _ := strconv.Atoi(o.DateService)
+		// Initial set
+		if timeDiff == 0 && service-currentTime > 0 {
+			timeDiff = service - currentTime
+			serviceTime = o.DateService
+			continue
+		}
+
+		// If the order is "closer" to current time and also not in the past
+		if service-currentTime > 0 && service-currentTime < timeDiff {
+			timeDiff = service - currentTime
+			serviceTime = o.DateService
+		}
+	}
+	t := getStringTime(serviceTime)
+	return t
 }
 
 // GetLeads - Get all leads

@@ -5,19 +5,16 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"strconv"
-	"time"
 )
 
-// Client this is a client in the format that Vonigo returns to us
-type Client struct {
+// WorkOrder is a order that has yet to be completed by the service provider.
+type WorkOrder struct {
 	ObjectID               string `json:"objectID"`
 	Name                   string `json:"name"`
 	Title                  string `json:"title"`
 	DateCreated            string `json:"dateCreated"`
 	DateLastEdited         string `json:"dateLastEdited"`
-	DateFirstUsed          string `json:"dateFirstUsed"`
-	DateLastUsed           string `json:"dateLastUsed"`
+	DateService            string `json:"dateService"`
 	CountClients           string `json:"countClients"`
 	CountContacts          string `json:"countContacts"`
 	CountContactsSecondary string `json:"countContactsSecondary"`
@@ -82,128 +79,28 @@ type Client struct {
 	} `json:"Relations"`
 }
 
-// GetEmail return the email address for the given Account
-func (c Client) GetEmail() string {
-	for _, value := range c.Fields {
-		if value.FieldID == fieldMap["email"] {
-			return value.FieldValue
-		}
-	}
-	return ""
-}
-
-// GetPhoneNumber return the email address for the given Account
-func (c Client) GetPhoneNumber() string {
-	for _, value := range c.Fields {
-		if value.FieldID == fieldMap["phone"] {
-			return value.FieldValue
-		}
-	}
-	return ""
-}
-
-// GetNextWorkOrderDate - return the string date of the next work order for a client
-func (c Client) GetNextWorkOrderDate() string {
-
-	clientID := c.ObjectID
-	workOrders, err := GetClientWorkOrders(clientID)
-	if err != nil {
-		return ""
-	}
-
-	if len(workOrders) == 0 {
-		return ""
-	}
-
-	if len(workOrders) == 1 {
-		order := workOrders[0]
-		return getStringTime(order.DateService)
-	}
-
-	currentTime := int(time.Now().Unix())
-	timeDiff := 0
-	serviceTime := ""
-	for _, o := range workOrders {
-		service, _ := strconv.Atoi(o.DateService)
-		// Initial set
-		if timeDiff == 0 && service-currentTime > 0 {
-			timeDiff = service - currentTime
-			serviceTime = o.DateService
-			continue
-		}
-
-		// If the order is "closer" to current time and also not in the past
-		if service-currentTime > 0 && service-currentTime < timeDiff {
-			timeDiff = service - currentTime
-			serviceTime = o.DateService
-		}
-	}
-	t := getStringTime(serviceTime)
-	return t
-}
-
-// GetClients - Get all clients
-func GetClients(params map[string]string) ([]Client, error) {
-	clients := []Client{}
-	clientResponse := ClientsResponse{}
+// GetClientWorkOrders - Get all work orders for a single client/account
+func GetClientWorkOrders(clientID string) ([]WorkOrder, error) {
+	worders := []WorkOrder{}
+	worderResponse := WorkOrderResponse{}
 	httpclient := &http.Client{}
-	log.Info("get clients!")
+	log.Info("get work orders for account!")
 
 	if !hasSecurityToken() {
 		err := getSecurityToken()
 		if err != nil {
-			return clients, err
+			return worders, err
 		}
 	}
 
-	mergedParams, _ := getBaseParams("retrieve")
+	params := map[string]string{}
+	params["clientID"] = clientID
+	params["securityToken"] = securityToken
+	params["isCompleteObject"] = "true"
 
-	for i, item := range params {
-		mergedParams[i] = item
-	}
-
-	log.Info("Params for Clients lookup: ", mergedParams)
-
-	reqURL, err := buildURL(baseURL, "api/v1/data/Clients")
+	reqURL, err := buildURL(baseURL, "api/v1/data/WorkOrders/")
 	if err != nil {
-		return nil, err
-	}
-
-	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(mergedParams)
-
-	req, err := http.NewRequest("POST", reqURL, buf)
-	req.Header.Add("Content-Type", "application/json")
-	resp, err := httpclient.Do(req)
-
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	err = json.Unmarshal(body, &clientResponse)
-	if err != nil {
-		return nil, err
-	}
-	return clientResponse.Clients, nil
-}
-
-// GetClient - Get a single client
-func GetClient(id int) (Client, error) {
-	stringID := strconv.Itoa(id)
-	client := Client{}
-	httpclient := &http.Client{}
-	clientResponse := ClientResponse{}
-
-	if !hasSecurityToken() {
-		err := getSecurityToken()
-		if err != nil {
-			return client, err
-		}
-	}
-	params, _ := getBaseParams("retrieve")
-	params["objectID"] = stringID
-
-	reqURL, err := buildURL(baseURL, "api/v1/data/Clients")
-	if err != nil {
-		return client, err
+		return worders, err
 	}
 	log.Info(reqURL)
 
@@ -219,12 +116,12 @@ func GetClient(id int) (Client, error) {
 	err = checkVonigoError(body)
 
 	if err != nil {
-		return client, err
+		return worders, err
 	}
 
-	err = json.Unmarshal(body, &clientResponse)
+	err = json.Unmarshal(body, &worderResponse)
 	if err != nil {
-		return client, err
+		return worders, err
 	}
-	return clientResponse.Client, nil
+	return worderResponse.WorkOrders, nil
 }

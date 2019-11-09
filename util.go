@@ -2,6 +2,8 @@ package vonigo
 
 import (
 	"errors"
+	"strconv"
+	"time"
 )
 
 func createFields(keys, values interface{}) ([]map[string]interface{}, error) {
@@ -39,4 +41,18 @@ func createFields(keys, values interface{}) ([]map[string]interface{}, error) {
 	}
 
 	return fields, errors.New("Parameter types did not match")
+}
+
+func getStringTime(t string) string {
+	if t != "" {
+		i, err := strconv.ParseInt(t, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		tm := time.Unix(i, 0)
+
+		return tm.UTC().String()
+	}
+
+	return ""
 }
