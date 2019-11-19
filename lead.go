@@ -102,6 +102,24 @@ func (c Lead) GetPhoneNumber() string {
 	return ""
 }
 
+// GetLeadType - Get type of lead: Residential, Commercial, or ""
+func (c Lead) GetLeadType() string {
+	for _, value := range c.Fields {
+		if value.FieldID == fieldMap["type"] {
+			if value.OptionID == 59 {
+				return "Residential"
+			}
+
+			if value.OptionID == 60 {
+				return "Commercial"
+			}
+
+			return ""
+		}
+	}
+	return ""
+}
+
 // GetNextWorkOrderDate - return the string date of the next work order for a lead
 func (c Lead) GetNextWorkOrderDate() string {
 
