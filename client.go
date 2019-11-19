@@ -160,6 +160,44 @@ func (c Client) GetNextWorkOrderDate() string {
 	return t
 }
 
+// GetNextWorkOrder - return the next work order for a client
+func (c Client) GetNextWorkOrder() WorkOrder {
+	w := WorkOrder{}
+	clientID := c.ObjectID
+	workOrders, err := GetClientWorkOrders(clientID)
+	if err != nil {
+		return w
+	}
+
+	if len(workOrders) == 0 {
+		return w
+	}
+
+	if len(workOrders) == 1 {
+		return workOrders[0]
+	}
+
+	currentTime := int(time.Now().Unix())
+	timeDiff := 0
+	currentWorkOrder := WorkOrder{}
+	for _, o := range workOrders {
+		service, _ := strconv.Atoi(o.DateService)
+		// Initial set
+		if timeDiff == 0 && service-currentTime > 0 {
+			timeDiff = service - currentTime
+			currentWorkOrder = o
+			continue
+		}
+
+		// If the order is "closer" to current time and also not in the past
+		if service-currentTime > 0 && service-currentTime < timeDiff {
+			timeDiff = service - currentTime
+			currentWorkOrder = o
+		}
+	}
+	return currentWorkOrder
+}
+
 // GetClients - Get all clients
 func GetClients(params map[string]string) ([]Client, error) {
 	clients := []Client{}

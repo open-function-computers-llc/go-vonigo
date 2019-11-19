@@ -125,3 +125,9 @@ func GetClientWorkOrders(clientID string) ([]WorkOrder, error) {
 	}
 	return worderResponse.WorkOrders, nil
 }
+
+// GetServiceDate - helper function to pull the next service date by converting
+// vonigo's UNIX timestamp into a timestamp friendly for humans
+func (o WorkOrder) GetServiceDate() string {
+	return getStringTime(o.DateService)
+}
