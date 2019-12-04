@@ -92,7 +92,7 @@ func (c Lead) GetEmail() string {
 	return ""
 }
 
-// GetPhoneNumber - Get email for lead
+// GetPhoneNumber - Get phone number for lead
 func (c Lead) GetPhoneNumber() string {
 	for _, value := range c.Fields {
 		if value.FieldID == fieldMap["phone"] {
