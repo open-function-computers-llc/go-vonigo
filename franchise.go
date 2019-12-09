@@ -52,6 +52,11 @@ func GetFranchises() ([]Franchise, error) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
+	// debug info
+	log.Info("Get all franchise request URL: ", reqURL)
+	log.Info("Request Payload: ", params)
+	log.Info("Get all franchise request Response: ", string(body))
+
 	type franchiseListResponsePayload struct {
 		Company       string      `json:"company"`
 		SecurityToken string      `json:"securityToken"`
